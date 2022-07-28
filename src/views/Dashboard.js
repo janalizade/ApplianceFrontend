@@ -1,6 +1,6 @@
 import React from "react";
 import ChartistGraph from "react-chartist";
-import styles from "./DashboardStyle.css";
+
 import {
   Badge,
   Button,
@@ -17,10 +17,24 @@ import {
 } from "react-bootstrap";
 import axios from 'axios';
 function Dashboard() {
-  const[appliance,setAppliance]=React.useState([]);
+  const[appliances,setAppliances]=React.useState([]);
   const[customer,setCustomer]=React.useState([]);
-  const[applianceStatus,setApplianceStatus]=React.useState([]);
-  const[arr,setArr]=React.useState([]);
+
+  const simpleChartData = {
+    labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+    series: [
+      [800000, 1200000, 1400000, 1300000],
+      [200000, 400000, 500000, 300000],
+      [100000, 200000, 400000, 600000]
+    ],
+  stackBars: true
+}
+
+  const customerStatus=[];
+  const arr=[];
+  const customer1=[];
+  const customer2=[];
+  const customer3=[];
   React.useEffect(()=>{
     var myHeaders = new Headers();
     myHeaders.append("Accept", "application/json");
@@ -33,74 +47,89 @@ function Dashboard() {
     axios.get("http://localhost:5171/api/appliance/all", requestOptions)
       .then(result => {
         setCustomer(result.data.map(item=>item.name))  
-        setAppliance(result.data.map(item=>item.appliances))
-       
-        
-      
-        applianceStatus.forEach((data) => {
-          arr.push(data==="ON"? 100 : 200)
-        })
-          
+        setAppliances(result.data.map(item=>item.appliances))      
       })
-      .catch(error => console.log('error', error));  
-    //  appliance.forEach((e1)=>{
-    //    setApplianceStatus(e1.map(item=>item.status))
-   //   })     
-      console.log('appliance',appliance)
-      console.log('applianceStatus',applianceStatus)
-      console.log('customer',customer)
+      .catch(error => console.log('error', error));    
     },[]);
+  
+   appliances.forEach((item)=>{
+    item.map((appliance)=>{
+     customerStatus.push(appliance.status)
+  
+    })
+  
+    })
+      console.log('customerStatus',customerStatus);
+     
+    customerStatus.forEach((data) => {
+      arr.push(data==="ON"? 100 : 200)
+    }) 
   return (
     <>
       <Container fluid>
         <Row>
-          <Col md="8">
+
+   
+          <Col md="12">
             <Card>
               <Card.Header>
                 <Card.Title as="h4">Appliances Behavior</Card.Title>
                 <p className="card-category">24 Hours performance</p>
               </Card.Header>
               <Card.Body>
-                <div className="ct-chart" id="chartHours">
-                  <ChartistGraph  className="ct-chart"
-                    data={{
-                      
-                      labels: customer,
-                      series: [arr]
-                    }}
-                    type="Bar"
-                    options = {{
+                    
+                <div  id="chartHours">
+                
+                          <ChartistGraph  
+                          data={{
+                            
+                            labels: customer,
+                            series: [
+                              [arr[0],arr[1],arr[2],arr[3],arr[4]],
+                              [arr[5],arr[6],arr[7]],
+                              [arr[8],arr[9]]
+                            ]
+                            
+                          }}
+                          type="Line"
+                          options = {{
+                            showLine: false,
+                            axisX: {
+                              showGrid:false,
+                              showLine:false,
+                              labelInterpolationFnc: function(value, index) {
+                                return index % 13 === 0 ? ''  : null;
+                              }
+                            },
 
-                      fullWidth: true,
-                      width: '100%',
-                      height: '200px',
-                      showPoint: true,
-                      lineSmooth: false,
-                  
-                      axisX: {
-                          showGrid: false,
-                          offset: 30,
-                          onlyInteger: true,
-                      },
-                  
-                      axisY: {
-                          offset: 25,
-                          position: 'end',
-                          labelInterpolationFnc: function(value) {
-                            if (value == 100) {
-                              return 'OFF'
-                            }
-                            if (value == 200) {
-                              return 'ON'
-                            }
-                             return ''
-                          }
-                      }
-                  }}
-                  />
+                            axisY: {
+                              grid: {
+                                display: false
+                              },
+                                offset: 25,
+                                position: 'end',
+                                labelInterpolationFnc: function(value) {
+                                  if (value == 100) {
+                                    return 'OFF'
+                                  }
+                                  if (value == 200) {
+                                    return 'ON'
+                                  }
+                                  return ''
+                                }
+                            },
+                           
+                          }}
+                          />  
+
                 </div>
               </Card.Body>
               <Card.Footer>
+               <div className="legend">
+               {customer[0]} <i className="fas fa-circle text-info"> </i>
+               {customer[1]} <i className="fas fa-circle text-danger"> </i>
+               {customer[2]} <i className="fas fa-circle text-yellow" > </i>
+               </div>
                
                 <hr></hr>
                 <div className="stats">

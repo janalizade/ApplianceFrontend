@@ -35,7 +35,7 @@ export default class User extends Component {
     };
    
   axios
-  .get("http://localhost:5171/api/customer/customer", requestOptions)
+  .get("http://localhost:5171/api/appliance/all", requestOptions)
   .then((response) => {
     const customer = res.data;
     this.setState({ customer });
