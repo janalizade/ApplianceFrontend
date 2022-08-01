@@ -126,9 +126,9 @@ function Dashboard() {
               </Card.Body>
               <Card.Footer>
                <div className="legend">
-               {customer[0]} <i className="fas fa-circle text-info"> </i>
-               {customer[1]} <i className="fas fa-circle text-danger"> </i>
-               {customer[2]} <i className="fas fa-circle text-yellow" > </i>
+               <tr>{customer[0]} <i className="fas fa-circle text-info"> </i></tr>
+               <tr>{customer[1]} <i className="fas fa-circle text-danger"> </i></tr>
+               <tr>{customer[2]} <i className="fas fa-circle text-yellow" > </i></tr>
                </div>
                
                 <hr></hr>

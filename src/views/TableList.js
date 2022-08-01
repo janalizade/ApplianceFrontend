@@ -12,39 +12,31 @@ import {
   Col,
 } from "react-bootstrap";
 import axios from 'axios';
-import { data } from "jquery";
 export default class User extends Component {
   constructor() {
       super();
       
       this.state = {
           data : [],
-          customer:[],
-          expandedRows : [],
-          customerId:[]
+          expandedRows : []
       };
   }
- async componentDidMount() {
-    const myHeaders = new Headers();
+  componentDidMount() {
+    var myHeaders = new Headers();
     myHeaders.append("Accept", "application/json");
-    const requestOptions = {
+    var requestOptions = {
       mode: 'no-cors',
       headers: myHeaders,
       method: 'GET',
       redirect: 'follow'
     };
-   
-  axios
-  .get("http://localhost:5171/api/appliance/all", requestOptions)
-  .then((response) => {
-    const customer = res.data;
-    this.setState({ customer });
-    return res.data;
-  })
-
-
-
-
+    axios.get("http://localhost:5171/api/appliance/all", requestOptions)
+    .then(res => {
+      const data = res.data;
+      this.setState({ data });
+    })
+    .catch(error => console.log('error', error));
+      
   }
   
   handleRowClick(rowId) {
@@ -52,21 +44,25 @@ export default class User extends Component {
       const isRowCurrentlyExpanded = currentExpandedRows.includes(rowId);
       
       const newExpandedRows = isRowCurrentlyExpanded ? 
-    currentExpandedRows.filter(aid => aid !== rowId) : 
+    currentExpandedRows.filter(name => name !== rowId) : 
     currentExpandedRows.concat(rowId);
       
       this.setState({expandedRows : newExpandedRows});
   }
   
   renderItem(item) {
-      const clickCallback = () => this.handleRowClick(item.aid);
+      const clickCallback = () => this.handleRowClick(item.name);
       const itemRows = [
-        <tr className="border-0" onClick={clickCallback} key={"row-data-" + item.aid}>
-            <td>{item.aid}</td>
+        <div>
+       
+        <tr className="border-0" onClick={clickCallback} key={"row-data-" + item.name}>
+            <td>{item.name}</td>
+            <td>{item.address}</td>
         </tr>
+        </div>
       ];
       
-      if(this.state.expandedRows.includes(item.aid)) {
+      if(this.state.expandedRows.includes(item.name)) {
           itemRows.push(
             <Row>
             <Col md="12">
@@ -79,19 +75,17 @@ export default class User extends Component {
                 </Card.Header>
                 <Card.Body className="table-full-width table-responsive px-0">
                   <Table className="table-hover ">
-                     <thead>
-                      <tr>
-                        <th className="border-0">Appliance factoryNumber</th>
-                        <th className="border-0">Appliance status</th>
-                        <th className="border-0">Customer Id</th>
-                      </tr>
-                    </thead>
-                    <tbody>              
-                          <tr className="border-0" key={"row-expanded-" + item.aid}>
-                          <td className="border-0">{item.factoryNumber}</td>
-                          <td className="border-0">{item.status}</td>
-                          <td className="border-0">{item.customerId}</td>
-                          </tr>                      
+                    
+                    <tbody> 
+                    
+                      {item.appliances.map(appliance=>{   
+                        return(          
+                          <tr className="border-0" key={"row-expanded-" + item.name}>
+                          <td className="border-0">{appliance.factoryNumber}</td>
+                          <td className="border-0">{appliance.status}</td>
+                          <td className="border-0">{appliance.aid}</td>
+                          </tr>
+                                );})}                      
                     </tbody>                   
                   </Table>
                 </Card.Body>
@@ -110,14 +104,11 @@ export default class User extends Component {
   
       
   render() {
-  
-    console.log('data',this.state.customer);
-      //const newStorage=localStorage.getItem('storage');
-      //const  statusResults = this.state.data.map(item => item.status)
-      //const newItems = JSON.stringify([newStorage,statusResults])
-      //localStorage.setItem('storage',newItems);
+      let allItemRows = [];
       
+      console.log('data',this.state.data);
       
+    
       this.state.data.forEach(item => {
           const perItemRows = this.renderItem(item);
           allItemRows = allItemRows.concat(perItemRows);
@@ -128,18 +119,13 @@ export default class User extends Component {
         <Col md="12">
           <Card className="strpied-tabled-with-hover">
             <Card.Header>
-              <Card.Title as="h4">Appliances Information</Card.Title>
+              <Card.Title as="h4">Customers Information</Card.Title>
               <p className="card-category">
               
               </p>
             </Card.Header>
             <Card.Body className="table-full-width table-responsive px-0">
               <Table className="table-hover table-striped">
-                 <thead>
-                  <tr>
-                    <th className="border-0">Appliances Id</th>
-                  </tr>
-                </thead>
                 <tbody>              
                 <table>{allItemRows}</table>                   
                 </tbody>                   
